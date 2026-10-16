@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Single theme on purpose: a dim chalkboard stays unnoticed in a classroom. */
+@theme inline {
+  --color-board: #1e2b27;
+  --color-board-2: #26362f;
+  --color-board-3: #314339;
+  --color-chalk: #e9e6da;
+  --color-dust: #8a9a92;
+  --color-c-yellow: #f2d16b;
+  --color-c-pink: #f29bb2;
+  --color-c-blue: #8ec5e8;
+  --color-c-mint: #9be0b8;
+  --color-c-orange: #f4a66a;
+  --color-c-lilac: #c3a7f0;
+  --font-sans: var(--font-body);
+  --font-chalk: var(--font-chalk);
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-board);
+}
+
+body {
+  background-color: var(--color-board);
+  /* chalk dust: fine noise plus a faint eraser smear */
+  background-image:
+    radial-gradient(ellipse 70% 40% at 30% 20%, rgb(233 230 218 / 0.045), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: var(--color-chalk);
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-c-yellow);
+  outline-offset: 2px;
+}
+
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center rounded-md border-2 border-chalk/70 px-4 font-bold text-chalk transition-colors hover:bg-chalk/10 active:bg-chalk/15 disabled:cursor-not-allowed disabled:border-chalk/20 disabled:text-dust disabled:hover:bg-transparent;
+}
+@utility btn-solid {
+  @apply btn border-chalk bg-chalk text-board hover:bg-chalk/90 active:bg-chalk/80 disabled:bg-transparent;
+}
+@utility field {
+  @apply min-h-11 w-full rounded-md border-2 border-chalk/30 bg-board-2 px-3 text-chalk placeholder:text-dust focus:border-chalk/70 focus:outline-none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
