@@ -7,6 +7,11 @@ export const tictactoe: Game<TicTacToe, number> = {
   id: "tictactoe",
   name: "Tic-Tac-Toe",
   blurb: "Three in a row. Ten seconds a round.",
+  rules: [
+    "Take turns marking an empty square.",
+    "Get three of your marks in a row (across, down or diagonal) to win.",
+    "If the board fills up with no row, it's a draw.",
+  ],
   min: 2,
   max: 2,
   init: () => ({ turn: 0, over: false, winners: [], b: Array(9).fill(-1), line: [] }),

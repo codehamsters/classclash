@@ -6,6 +6,8 @@ import { GAMES, gameById } from "@/games";
 import { selfId, useRoom, type RoomState } from "@/lib/room";
 import { CHALK } from "@/lib/ui";
 import Stealth from "./Stealth";
+import Logo from "./Logo";
+import Rules from "./Rules";
 import type { BoardProps } from "./boards/types";
 import TicTacToe from "./boards/TicTacToe";
 import Connect4 from "./boards/Connect4";
@@ -45,7 +47,7 @@ export default function Room({ code, name, creator }: { code: string; name: stri
     <>
       <main className="mx-auto w-full max-w-xl px-4 pb-16" aria-hidden={hidden || undefined}>
         <header className="flex items-center justify-between py-3">
-          <Link href="/" className="font-chalk text-xl">ClassClash</Link>
+          <Link href="/" className="flex items-center gap-2 font-chalk text-xl"><Logo className="size-7" />ClassClash</Link>
           <div className="flex items-center gap-2">
             {playing && <span className="font-chalk text-xl tracking-[0.15em] text-dust" aria-label={`Room code ${code}`}>{code}</span>}
             <button type="button" className="btn min-h-9 px-3 text-sm" onClick={() => setHidden(true)}>Hide</button>
@@ -162,6 +164,11 @@ function Lobby({ state, act, code, color }: { state: RoomState; act: Act; code: 
           {n < g.min ? `${g.name} needs ${g.min} players. Waiting for a friend to join.` : n > g.max ? `${g.max} of you play this round, the rest watch. Turns rotate each game.` : g.blurb}
         </p>
       </div>
+
+      <section className="mt-8" aria-labelledby="how">
+        <h2 id="how" className="text-sm text-dust">How to play {g.name}</h2>
+        <Rules rules={g.rules} className="mt-2" />
+      </section>
     </div>
   );
 }
@@ -195,6 +202,10 @@ function GameView({ state, act, color, isHost }: { state: RoomState; act: Act; c
         {status}
       </p>
       <Board s={s} me={me} act={(m) => act({ t: "move", m })} colors={colors} names={names} />
+      <details className="rounded-md border border-chalk/15 px-3 py-2">
+        <summary className="cursor-pointer text-sm text-dust">How to play</summary>
+        <Rules rules={g.rules} className="mt-2 pb-1 text-sm" />
+      </details>
       {s.over ? (
         <div className="flex gap-2 pt-2">
           <button type="button" className="btn-solid flex-1" onClick={() => act({ t: "start" })}>Play again</button>

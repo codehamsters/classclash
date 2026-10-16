@@ -33,6 +33,11 @@ export const battleship: Game<Battleship, BattleshipMove> = {
   id: "battleship",
   name: "Battleship",
   blurb: "Hide your fleet. Hunt theirs.",
+  rules: [
+    "Shuffle until you like your fleet, then lock it in. Ships are 4, 3, 3, 2 and 2 squares long.",
+    "Take turns firing at a square in your opponent's waters. ✕ is a hit, a dot is a miss.",
+    "Sink every ship in their fleet to win.",
+  ],
   min: 2,
   max: 2,
   init: () => ({

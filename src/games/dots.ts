@@ -9,6 +9,11 @@ export const dots: Game<Dots, DotsMove> = {
   id: "dots",
   name: "Dots & Boxes",
   blurb: "Close a box, take another turn.",
+  rules: [
+    "Take turns drawing one line between two neighbouring dots.",
+    "Draw the fourth side of a box to claim it, then take another turn.",
+    "When every box is claimed, whoever has the most boxes wins.",
+  ],
   min: 2,
   max: 6,
   init(n) {

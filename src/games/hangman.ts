@@ -32,6 +32,12 @@ export const hangman: Game<Hangman, HangmanMove> = {
   id: "hangman",
   name: "Hangman",
   blurb: "Pick a secret word. Everyone else hunts letters.",
+  rules: [
+    "Each round, one player sets a secret word of 3 to 12 letters.",
+    "Everyone else takes turns guessing one letter. Six wrong guesses and the figure is hanged.",
+    "If the word is solved, every guesser scores 1. If not, the setter scores 2.",
+    "Everyone sets one word. Highest score at the end wins.",
+  ],
   min: 2,
   max: 6,
   init: (n) => fresh(n, 0, Array(n).fill(0)),

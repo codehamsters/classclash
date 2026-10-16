@@ -11,6 +11,8 @@ export type Game<S extends Base = any, M = any> = {
   id: string;
   name: string;
   blurb: string;
+  /** how to play, one short sentence per step */
+  rules: string[];
   min: number;
   max: number;
   init: (players: number) => S;

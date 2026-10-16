@@ -10,6 +10,11 @@ export const memory: Game<Memory, number> = {
   id: "memory",
   name: "Memory",
   blurb: "Flip two. Remember everything.",
+  rules: [
+    "On your turn, flip two cards.",
+    "A match is yours to keep, and you go again. No match, and the next player goes.",
+    "When every pair is found, whoever has the most pairs wins.",
+  ],
   min: 2,
   max: 6,
   init: (n) => ({

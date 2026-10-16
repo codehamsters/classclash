@@ -1,11 +1,14 @@
 import { GAMES } from "@/games";
 import Home from "@/components/Home";
+import Logo from "@/components/Logo";
+import Rules from "@/components/Rules";
 
 const players = (min: number, max: number) => (min === max ? `${min} players` : `${min} to ${max} players`);
 
 export default function Page() {
   return (
     <main className="mx-auto w-full max-w-xl px-4 pb-16 pt-10 sm:pt-16">
+      <Logo className="mb-5 size-16 rounded-[14px] ring-1 ring-chalk/20 sm:size-20" />
       <h1 className="font-chalk text-6xl font-bold leading-none tracking-tight sm:text-7xl">ClassClash</h1>
       <p className="mt-4 max-w-md text-lg text-chalk/80">
         Games for when class drags and your friend sits across the room. No talking, no sound, no sign-up.
@@ -15,14 +18,23 @@ export default function Page() {
 
       <section aria-labelledby="games" className="mt-14">
         <h2 id="games" className="font-chalk text-2xl">On the board today</h2>
+        <p className="mt-1 text-sm text-dust">Tap a game to see how it&apos;s played.</p>
         <ul className="mt-3 divide-y divide-chalk/10 border-y border-chalk/10">
           {GAMES.map((g) => (
-            <li key={g.id} className="flex items-baseline justify-between gap-4 py-3">
-              <div>
-                <p className="font-chalk text-xl">{g.name}</p>
-                <p className="text-sm text-dust">{g.blurb}</p>
-              </div>
-              <p className="shrink-0 text-sm text-dust">{players(g.min, g.max)}</p>
+            <li key={g.id}>
+              <details className="group">
+                <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 py-3 [&::-webkit-details-marker]:hidden">
+                  <div>
+                    <p className="font-chalk text-xl">{g.name}</p>
+                    <p className="text-sm text-dust">{g.blurb}</p>
+                  </div>
+                  <p className="shrink-0 text-sm text-dust">
+                    {players(g.min, g.max)}
+                    <span aria-hidden="true" className="ml-3 inline-block w-4 text-center text-xl font-bold leading-none transition-transform group-open:rotate-45">+</span>
+                  </p>
+                </summary>
+                <Rules rules={g.rules} className="pb-4 text-sm" />
+              </details>
             </li>
           ))}
         </ul>

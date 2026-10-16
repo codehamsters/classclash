@@ -8,6 +8,11 @@ export const connect4: Game<Connect4, number> = {
   id: "connect4",
   name: "Connect Four",
   blurb: "Drop discs. Line up four before they do.",
+  rules: [
+    "Tap a column to drop a disc. It falls to the lowest empty spot.",
+    "Line up four of your discs across, down or diagonally to win.",
+    "A full board with no line of four is a draw.",
+  ],
   min: 2,
   max: 2,
   init: () => ({ turn: 0, over: false, winners: [], b: Array(C4_W * C4_H).fill(-1), last: -1, line: [] }),

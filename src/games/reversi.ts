@@ -28,6 +28,11 @@ export const reversi: Game<Reversi, number> = {
   id: "reversi",
   name: "Reversi",
   blurb: "Flank to flip. Most discs at the end wins.",
+  rules: [
+    "Place a disc so it traps a straight line of your opponent's discs between it and one of yours. The trapped discs flip to your colour.",
+    "Small dots show where you can play. With no legal move, your turn is skipped.",
+    "When neither player can move, whoever has the most discs wins.",
+  ],
   min: 2,
   max: 2,
   init() {
