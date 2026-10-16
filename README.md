@@ -1,5 +1,7 @@
 # ClassClash
 
+Live at https://classclash.hokora.xyz
+
 Silent multiplayer games for friends sitting apart in the same classroom. One person starts a room and shares the 4-letter code. Everyone else types it in and plays. No sign-up, no sound. A Hide button (or Esc) swaps the screen for fake lecture notes.
 
 Games: Tic-Tac-Toe, Connect Four, Reversi, Battleship (2 players), plus Dots & Boxes, Hangman and Memory (2 to 6 players).
