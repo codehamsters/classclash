@@ -74,15 +74,28 @@ export default function Room({ code, name, creator }: { code: string; name: stri
 
 function Lobby({ state, act, code, color }: { state: RoomState; act: Act; code: string; color: (id: string) => string }) {
   const [copied, setCopied] = useState(false);
+  const [manual, setManual] = useState("");
   const g = gameById(state.gameId)!;
   const n = state.players.length;
 
   const share = async () => {
     const url = `${location.origin}/r/${code}`;
+    // native share sheet on phones only; desktop share sheets are flaky, a copied link is what people expect there
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+      try {
+        await navigator.share({ title: "ClassClash", text: `Join my room: ${code}`, url });
+        return;
+      } catch (e) {
+        if ((e as Error).name === "AbortError") return; // user closed the sheet
+      }
+    }
     try {
-      if (navigator.share) await navigator.share({ title: "ClassClash", text: `Join my room: ${code}`, url });
-      else { await navigator.clipboard.writeText(url); setCopied(true); }
-    } catch {} // share sheet dismissed
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setManual(url); // clipboard blocked: show the link to copy by hand
+    }
   };
 
   return (
@@ -95,6 +108,13 @@ function Lobby({ state, act, code, color }: { state: RoomState; act: Act; code: 
           {copied ? "Link copied" : "Share link"}
         </button>
       </p>
+      {manual && (
+        <input
+          readOnly value={manual} aria-label="Room link" autoFocus
+          onFocus={(e) => e.currentTarget.select()}
+          className="field mt-2 text-sm"
+        />
+      )}
 
       {state.note && <p className="mt-6 rounded-md border border-c-orange/40 px-3 py-2 text-c-orange" role="status">{state.note}</p>}
 
