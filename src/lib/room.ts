@@ -86,8 +86,9 @@ export function useRoom(code: string, name: string, creator: boolean) {
       stateAct.send(st);
     };
 
-    stateAct.onMessage = (data: RoomState) => {
-      if (st && data.v <= st.v) return;
+    stateAct.onMessage = (data: RoomState, { peerId }) => {
+      // once we have a room, only the host we see may change it
+      if (st && (peerId !== hostId() || data.v <= st.v)) return;
       st = data;
       setState(st);
       // our hello may have reached the host before it had a room; ask again
