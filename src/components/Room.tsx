@@ -22,7 +22,7 @@ const BOARDS: Record<string, ComponentType<BoardProps>> = {
 type Act = ReturnType<typeof useRoom>["act"];
 
 export default function Room({ code, name, creator }: { code: string; name: string; creator: boolean }) {
-  const { state, act, claim } = useRoom(code, name, creator);
+  const { state, act, claim, isHost } = useRoom(code, name, creator);
   const [hidden, setHidden] = useState(false);
   const [lonely, setLonely] = useState(false);
 
@@ -62,7 +62,7 @@ export default function Room({ code, name, creator }: { code: string; name: stri
             )}
           </section>
         ) : playing ? (
-          <GameView state={state} act={act} color={color} />
+          <GameView state={state} act={act} color={color} isHost={isHost} />
         ) : (
           <Lobby state={state} act={act} code={code} color={color} />
         )}
@@ -146,7 +146,7 @@ function Lobby({ state, act, code, color }: { state: RoomState; act: Act; code: 
   );
 }
 
-function GameView({ state, act, color }: { state: RoomState; act: Act; color: (id: string) => string }) {
+function GameView({ state, act, color, isHost }: { state: RoomState; act: Act; color: (id: string) => string; isHost: boolean }) {
   const g = gameById(state.gameId)!;
   const Board = BOARDS[g.id];
   const s = state.game;
@@ -180,10 +180,14 @@ function GameView({ state, act, color }: { state: RoomState; act: Act; color: (i
           <button type="button" className="btn-solid flex-1" onClick={() => act({ t: "start" })}>Play again</button>
           <button type="button" className="btn flex-1" onClick={() => act({ t: "lobby" })}>Change game</button>
         </div>
-      ) : (
+      ) : isHost ? (
         <button type="button" className="text-sm text-dust underline underline-offset-4 hover:text-chalk" onClick={() => act({ t: "lobby" })}>
           End game for everyone
         </button>
+      ) : (
+        <Link href="/" className="inline-block text-sm text-dust underline underline-offset-4 hover:text-chalk">
+          Leave room
+        </Link>
       )}
     </div>
   );

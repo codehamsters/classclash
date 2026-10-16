@@ -11,7 +11,7 @@ Games: Tic-Tac-Toe, Connect Four, Reversi, Battleship (2 players), plus Dots & B
 There is no backend and no database. Vercel only serves static files.
 
 - Peers find each other through public Nostr relays ([Trystero](https://github.com/dmotz/trystero)), then talk directly over WebRTC. The room code also works as the encryption password for the handshake.
-- The host is whichever present player has the lowest peer id. The host checks every move and broadcasts the full room state. Every peer keeps the latest state, so if the host leaves, the next player takes over.
+- The room creator is the host. The host checks every move, broadcasts the full room state, and is the only one who can end a game early (others can leave). Every peer keeps the latest state, so if the host leaves, the next player to have joined takes over.
 - Game rules are pure functions in `src/games/*.ts`: `init(players)` and `move(state, seat, move) → next | null`.
 
 Known limits:

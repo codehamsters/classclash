@@ -27,7 +27,7 @@ const fresh = (name: string): RoomState =>
 
 /**
  * Serverless room: peers find each other over public Nostr relays, then talk over WebRTC.
- * The present player with the lowest id in state.players is host:
+ * The earliest-joined player still present is host (the creator, until they leave):
  * it validates every intent and broadcasts the whole state. Everyone keeps the latest
  * state, so if the host drops, the next player picks up from there.
  */
@@ -46,7 +46,7 @@ export function useRoom(code: string, name: string, creator: boolean) {
     const helloAct = room.makeAction<string>("hello");
     const intentAct = room.makeAction<any>("intent");
 
-    const hostId = () => (st ? st.players.map((p) => p.id).filter((id) => present.has(id)).sort()[0] : undefined);
+    const hostId = () => st?.players.find((p) => present.has(p.id))?.id;
     const commit = (next: Omit<RoomState, "v">) => {
       st = { ...next, v: (st?.v ?? 0) + 1 };
       setState(st);
@@ -57,6 +57,9 @@ export function useRoom(code: string, name: string, creator: boolean) {
       if (!st) return;
       const g = gameById(i.t === "pick" ? i.id : st.gameId);
       if (!g) return;
+      // only the host may cut a running game short; anyone can move on once it's over
+      const running = st.game && !st.game.over;
+      if ((i.t === "lobby" || i.t === "start") && running && from !== hostId()) return;
       if (i.t === "move") {
         const seat = st.seats.indexOf(from);
         const next = seat >= 0 && st.game ? g.move(st.game, seat, i.m) : null;
@@ -137,5 +140,7 @@ export function useRoom(code: string, name: string, creator: boolean) {
   /** nobody answered with a room: start one here instead of waiting forever */
   const claim = useCallback(() => claimRef.current(), []);
 
-  return { state, peers, act, claim };
+  const isHost = state?.players.find((p) => p.id === selfId || peers.includes(p.id))?.id === selfId;
+
+  return { state, peers, act, claim, isHost };
 }
