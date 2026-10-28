@@ -27,9 +27,13 @@ npm test        # game rule tests (node:test)
 npm run build
 ```
 
-Deploy by importing the repo into Vercel. To let players on different networks connect, create a free TURN key in Cloudflare (Dashboard → Realtime → TURN Server) and set:
+Deploy by importing the repo into Vercel. To let players on different networks connect, set up Cloudflare TURN and add these env vars:
 
-- `CF_TURN_KEY_ID`: the TURN key ID
-- `CF_TURN_API_TOKEN`: the key's API token
+- `CF_TURN_KEY_ID`, `CF_TURN_API_TOKEN`: create a TURN key under Cloudflare Dashboard → Realtime → TURN Server
+- `CF_ACCOUNT_ID`: your Cloudflare account ID
+- `CF_API_TOKEN`: an account API token with **Account Analytics: Read** and **Realtime (Calls): Edit**
+- `TURN_CAP_GB` (optional, default 800)
+
+Cloudflare TURN has no spending cap, so `/api/ice` enforces one. It hands out 2-hour credentials only while the last 30 days of TURN traffic is under `TURN_CAP_GB` (the free tier is 1,000 GB a month). Once usage reaches the cap, it deletes the TURN key so credentials already handed out stop working too. To turn relaying back on, create a new key and update `CF_TURN_KEY_ID` and `CF_TURN_API_TOKEN`. If any of these vars is missing, or the usage check fails, it hands out no TURN credentials at all.
 
 Without them the app still works, but only between players who can reach each other directly.
