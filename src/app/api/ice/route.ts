@@ -24,7 +24,11 @@ let killed = false;
 export async function GET() {
   await connection();
   const { CF_TURN_KEY_ID: keyId, CF_TURN_API_TOKEN: keyToken, CF_ACCOUNT_ID: account, CF_API_TOKEN: apiToken } = process.env;
-  if (!keyId || !keyToken || !account || !apiToken || killed) return json([]);
+  if (!keyId || !keyToken || !account || !apiToken) {
+    console.error("TURN disabled: missing CF_TURN_KEY_ID, CF_TURN_API_TOKEN, CF_ACCOUNT_ID or CF_API_TOKEN");
+    return json([]);
+  }
+  if (killed) return json([]);
   if (!(await underCap(account, apiToken, keyId))) return json([]);
   try {
     const res = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${keyId}/credentials/generate-ice-servers`, {
@@ -32,14 +36,18 @@ export async function GET() {
       headers: { Authorization: `Bearer ${keyToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({ ttl: TTL_SECONDS }),
     });
-    if (!res.ok) return json([]);
+    if (!res.ok) {
+      console.error(`TURN credentials failed: ${res.status} ${(await res.text()).slice(0, 300)}`);
+      return json([]);
+    }
     const { iceServers } = (await res.json()) as { iceServers: RTCIceServer | RTCIceServer[] };
     // browsers block port 53, and stun entries are already covered by Trystero's defaults
     const turn = [iceServers].flat()
       .map((s) => ({ ...s, urls: [s.urls].flat().filter((u) => u.startsWith("turn") && !/:53\b/.test(u)) }))
       .filter((s) => s.urls.length);
     return json(turn);
-  } catch {
+  } catch (e) {
+    console.error("TURN credentials failed", e);
     return json([]);
   }
 }
@@ -71,13 +79,15 @@ async function usedBytes(account: string, apiToken: string): Promise<number | nu
       headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables: { account, since: new Date(Date.now() - WINDOW_MS).toISOString() } }),
     });
-    if (!res.ok) return null;
-    const body = await res.json();
-    if (body.errors?.length) return null;
-    const groups = body.data?.viewer?.accounts?.[0]?.callsTurnUsageAdaptiveGroups;
-    if (!Array.isArray(groups)) return null;
+    const body = await res.json().catch(() => null);
+    const groups = body?.data?.viewer?.accounts?.[0]?.callsTurnUsageAdaptiveGroups;
+    if (!res.ok || body?.errors?.length || !Array.isArray(groups)) {
+      console.error(`TURN usage check failed: ${res.status} ${JSON.stringify(body?.errors ?? body).slice(0, 300)}`);
+      return null;
+    }
     return groups.reduce((n: number, g: { sum?: { egressBytes?: number } }) => n + (g.sum?.egressBytes ?? 0), 0);
-  } catch {
+  } catch (e) {
+    console.error("TURN usage check failed", e);
     return null;
   }
 }
