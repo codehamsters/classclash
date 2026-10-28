@@ -24,7 +24,7 @@ const BOARDS: Record<string, ComponentType<BoardProps>> = {
 type Act = ReturnType<typeof useRoom>["act"];
 
 export default function Room({ code, name, creator }: { code: string; name: string; creator: boolean }) {
-  const { state, act, claim, isHost } = useRoom(code, name, creator);
+  const { state, act, claim, isHost, unreachable } = useRoom(code, name, creator);
   const [hidden, setHidden] = useState(false);
   const [lonely, setLonely] = useState(false);
 
@@ -58,8 +58,15 @@ export default function Room({ code, name, creator }: { code: string; name: stri
           <section className="pt-10">
             <p className="text-dust">Joining room</p>
             <p className="font-chalk text-8xl font-bold tracking-[0.15em]">{code}</p>
-            <p className="mt-6 text-chalk/80">{lonely ? "Nobody's in this room yet." : "Looking for your friends…"}</p>
-            {lonely && (
+            {unreachable ? (
+              <>
+                <p className="mt-6 text-chalk/80">Found someone in this room, but your networks won&apos;t let you connect.</p>
+                <p className="mt-2 text-dust">Try putting both devices on the same network, or both on mobile data.</p>
+              </>
+            ) : (
+              <p className="mt-6 text-chalk/80">{lonely ? "Nobody's in this room yet." : "Looking for your friends…"}</p>
+            )}
+            {lonely && !unreachable && (
               <button type="button" className="btn-solid mt-4" onClick={claim}>Open this room myself</button>
             )}
           </section>
